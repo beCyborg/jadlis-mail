@@ -5,7 +5,7 @@
 Mail for Claude Code: your mailboxes over IMAP through himalaya — iCloud, Gmail, Proton through Proton Mail Bridge, or any other IMAP server.
 
 ```
-claude plugin marketplace add https://gitlab.com/beCyborg/jadlis-hub.git
+claude plugin marketplace add https://github.com/beCyborg/jadlis-hub.git
 claude plugin install jadlis-mail@jadlis
 ```
 
