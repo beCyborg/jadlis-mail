@@ -10,6 +10,10 @@ Any other Bash call of the same session voids that session's open tickets. So a 
 inside a compound command, through bash -c, with an env prefix, quoted — finds no ticket: either the ticket was
 voided by that very call's hook, or it never existed. Sending without the prompt needs a deliberately forged
 ticket; this gate stops a misled model, not a hostile one (references/security.md).
+
+Plugin option `send_confirmation` (env CLAUDE_PLUGIN_OPTION_SEND_CONFIRMATION): `always` (default, also for any
+unknown value) asks as above; `policy` writes the same ticket and returns "allow", so an autonomous agent sends by
+its own policy without a prompt. The canonical form, the voiding of tickets and every jm send check stay the same.
 """
 import json
 import os
@@ -57,6 +61,12 @@ def main():
     with os.fdopen(fd, "w") as f:
         json.dump({"code": code, "hash": digest, "ts": time.time(), "session": session}, f)
     os.replace(tmp, TICKETS / f"{code}.json")
+    if os.environ.get("CLAUDE_PLUGIN_OPTION_SEND_CONFIRMATION", "").strip().lower() == "policy":
+        print(json.dumps({"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "allow",
+                                                 "permissionDecisionReason": f"jadlis-mail send_confirmation=policy: "
+                                                                             f"{code} (hash {digest}) по политике агента"}},
+                         ensure_ascii=False))
+        return 0
     reason = (f"Отправить письмо {code}? Уйдёт ровно та версия черновика, которую ты видел (hash {digest}). "
               "Нет — отправка не произойдёт.")
     print(json.dumps({"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "ask",

@@ -4,6 +4,21 @@
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-11-07 — режим отправки по политике / policy send mode
+
+### Для человека
+
+- Новая опция `send_confirmation`: `always` (как раньше, по умолчанию) или `policy` — автономный агент отправляет письмо сам, по правилам своей политики, без запроса.
+- В режиме `policy` проверка хеша черновика, отправителя и Hide My Email остаётся; убери только правило `ask` для `jm send`.
+
+### For agents
+
+- Added: `userConfig.send_confirmation` (`options: always|policy`, default `always`; needs Claude Code 2.1.271+).
+- Changed: `hooks/send_gate.py` — with `CLAUDE_PLUGIN_OPTION_SEND_CONFIRMATION=policy` it writes the same ticket and returns `permissionDecision: allow`; any other value asks as before.
+- Changed: `skills/mail/SKILL.md` hard rule 3 branches on `${user_config.send_confirmation}`; `references/security.md` and both READMEs describe the mode.
+- Migration: none for `always`. For `policy`: `claude plugin uninstall jadlis-mail@<m>` → `claude plugin install jadlis-mail@<m> --config send_confirmation=policy`, remove `Bash(*jm send*)` from `permissions.ask`.
+- Tests: `tests/test_jadlis_mail_gate.py` 13g–13i.
+
 ## [0.2.0] — 2026-11-03 — публичная версия и mail-wait.sh / public release and mail-wait.sh
 
 ### Для человека

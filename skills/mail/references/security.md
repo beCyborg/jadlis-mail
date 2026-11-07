@@ -16,6 +16,8 @@
 
 What this gives: a send written in any other form — inside `&&`, through `bash -c`, with an env prefix, quoted — finds no ticket and fails, so a misled model cannot send without the owner's «да» on the exact draft.
 
+**Mode `policy`** (plugin option `send_confirmation`, set with `claude plugin install jadlis-mail@<marketplace> --config send_confirmation=policy`; an already installed plugin ignores `--config`, so uninstall first). The hook writes the same ticket but returns `allow`, so there is no prompt; layers 3 and 4 stay. Remove `Bash(*jm send*)` from `permissions.ask` too — an ask rule still asks whatever the hook returns. What decides a send is then the agent's own policy in its context, i.e. text a hostile page or letter can argue with: use this mode only for an agent that writes from its own mailbox and when the owner accepts that risk.
+
 **Limit.** Rules on command text catch the usual spelling only (docs `permissions.md` «What a Bash rule doesn't match»). A model that deliberately forges a ticket file or writes its own SMTP client gets past every layer. The gate stops a misled model, not a hostile one.
 
 ## Secrets

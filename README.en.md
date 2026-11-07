@@ -81,6 +81,8 @@ The plugin's hook `hooks/send_gate.py` is on by itself. Add the permission rules
 
 If the file already has `permissions`, add the lines to the existing lists. A letter goes out only when you answer «yes» to the prompt with the draft's code and hash. Details — [skills/mail/references/security.md](skills/mail/references/security.md).
 
+An autonomous agent with its own mailbox can use mode `policy`: it sends by its own policy, without a prompt. Turn it on at install — `claude plugin install jadlis-mail@jadlis --config send_confirmation=policy` (uninstall an installed copy first: a repeat install silently ignores `--config`). Drop the `ask` rule for `jm send` in this mode. The hash check and the `deny` rules stay. The default is `always`.
+
 ## Waiting for a letter from a script
 
 `scripts/mail-wait.sh` waits for a confirmation letter, for example after a sign-up on a service:

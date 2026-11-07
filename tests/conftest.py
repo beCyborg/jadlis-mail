@@ -270,10 +270,12 @@ class MailEnv:
         return run_gate(self.home, command, session or self.session)
 
 
-def run_gate(home, command, session, tool="Bash"):
+def run_gate(home, command, session, tool="Bash", mode=None):
     payload = {"session_id": session, "tool_name": tool, "tool_input": {"command": command},
                "hook_event_name": "PreToolUse"}
     env = {"HOME": str(home), "PATH": os.environ.get("PATH", "/usr/bin:/bin")}
+    if mode is not None:
+        env["CLAUDE_PLUGIN_OPTION_SEND_CONFIRMATION"] = mode
     r = subprocess.run([str(GATE_PATH)], input=json.dumps(payload), capture_output=True, text=True, env=env,
                        timeout=30)
     assert r.returncode == 0, r.stderr

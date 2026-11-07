@@ -77,3 +77,25 @@ def test_13f_non_bash_tool_is_ignored(home):
     run_gate(home, CANON, SESSION)
     assert run_gate(home, "anything", SESSION, tool="Read") is None
     assert "D1.json" in tickets(home)
+
+
+@pytest.mark.parametrize("mode", [None, "", "always", "ALWAYS", "bogus"])
+def test_13g_default_and_unknown_modes_still_ask(home, mode):
+    out = run_gate(home, CANON, SESSION, mode=mode)
+    assert out["hookSpecificOutput"]["permissionDecision"] == "ask"
+    assert "D1.json" in tickets(home)
+
+
+@pytest.mark.parametrize("mode", ["policy", " Policy "])
+def test_13h_policy_mode_allows_with_the_same_ticket(home, mode):
+    out = run_gate(home, CANON, SESSION, mode=mode)
+    hso = out["hookSpecificOutput"]
+    assert hso["permissionDecision"] == "allow" and "D1" in hso["permissionDecisionReason"]
+    t = tickets(home)["D1.json"]
+    assert t["code"] == "D1" and t["hash"] == "0123456789" and t["session"] == SESSION
+
+
+def test_13i_policy_mode_keeps_voiding_and_no_ticket_for_other_forms(home):
+    run_gate(home, CANON, SESSION, mode="policy")
+    out = run_gate(home, "X=1 jm send D1 --hash 0123456789", SESSION, mode="policy")
+    assert out is None and tickets(home) == {}
