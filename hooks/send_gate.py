@@ -23,7 +23,8 @@ import time
 from pathlib import Path
 
 TICKETS = Path.home() / ".claude" / "jadlis" / "mail" / "tickets"
-CANON = re.compile(r"\A[ \t]*(?:[A-Za-z0-9_.~/-]*/)?jm[ \t]+send[ \t]+(D\d{1,5})[ \t]+--hash[ \t]+([0-9a-f]{10,64})[ \t]*\Z")
+# An optional trailing ` 2>&1` is accepted: agents add it by habit, and it only merges jm's stderr into stdout.
+CANON = re.compile(r"\A[ \t]*(?:[A-Za-z0-9_.~/-]*/)?jm[ \t]+send[ \t]+(D\d{1,5})[ \t]+--hash[ \t]+([0-9a-f]{10,64})(?:[ \t]+2>&1)?[ \t]*\Z")
 
 
 def void(session):

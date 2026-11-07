@@ -99,3 +99,9 @@ def test_13i_policy_mode_keeps_voiding_and_no_ticket_for_other_forms(home):
     run_gate(home, CANON, SESSION, mode="policy")
     out = run_gate(home, "X=1 jm send D1 --hash 0123456789", SESSION, mode="policy")
     assert out is None and tickets(home) == {}
+
+
+def test_13j_trailing_stderr_merge_is_still_canonical(home):
+    out = run_gate(home, "jm send D3 --hash abcdef0123 2>&1", SESSION)
+    assert out["hookSpecificOutput"]["permissionDecision"] == "ask" and "D3.json" in tickets(home)
+    assert run_gate(home, "jm send D3 --hash abcdef0123 2>&1 | cat", SESSION) is None and tickets(home) == {}

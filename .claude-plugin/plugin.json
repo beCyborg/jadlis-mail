@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "jadlis-mail",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "displayName": "Jadlis — почта через jm и himalaya",
   "description": "Скилл и скрипт jm: Claude читает твои ящики по IMAP через himalaya (iCloud, Gmail, Proton через Bridge, любой IMAP), сам раскладывает входящие по «Рассылкам», «Уведомлениям» и «Спаму» с проверкой каждого переноса и откатом «верни», убирает старое прочитанное в архив, ищет письма и вложения, ждёт нужное письмо (в том числе из скрипта mail-wait.sh), готовит черновики. Письмо уходит только после того, как ты подтвердишь в запросе Claude Code ровно этот черновик; для автономного агента есть режим отправки по политике (опция send_confirmation).",
   "author": {

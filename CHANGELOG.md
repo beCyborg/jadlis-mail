@@ -4,6 +4,14 @@
 
 ## [Unreleased]
 
+## [0.3.1] — 2026-11-07 — `2>&1` в конце отправки / trailing `2>&1` on send
+
+### Для человека
+- Отправка больше не срывается, если агент по привычке дописал к команде `2>&1`.
+
+### For agents
+- Changed: `hooks/send_gate.py` CANON accepts an optional trailing ` 2>&1`; any other suffix (pipes, `;`, `&&`) still finds no ticket. `SKILL.md` rule 3 says so. Tests: 13j.
+
 ## [0.3.0] — 2026-11-07 — режим отправки по политике / policy send mode
 
 ### Для человека
