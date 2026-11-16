@@ -4,6 +4,18 @@
 
 ## [Unreleased]
 
+## [0.4.0] — 2026-11-16 — jm на Linux / jm on Linux
+
+### Для человека
+- jm работает на сервере с Linux: та же почта, поиск и черновики, что на Mac. На Mac ничего не меняется.
+
+### For agents
+- Changed: `scripts/jm` starts through `/bin/sh`: Homebrew `python3.13 -I` when present (macOS, as before), else `python3 -I` from `PATH`.
+- Changed: himalaya path = `JM_HIMALAYA` → `/opt/homebrew/bin/himalaya` on macOS → `PATH` → `~/.local/bin/himalaya`.
+- Changed: on Linux `ensure_bridge` starts the `systemd --user` unit `proton-bridge.service` (`JM_BRIDGE_UNIT`) instead of `open -a`.
+- Added: `config.json` → `timezone` (IANA) sets `TZ` when the environment has none.
+- Docs: `references/accounts.md` § Linux. Tests: `tests/test_jadlis_mail_linux.py`.
+
 ## [0.3.1] — 2026-11-07 — `2>&1` в конце отправки / trailing `2>&1` on send
 
 ### Для человека

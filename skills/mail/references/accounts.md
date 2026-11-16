@@ -91,6 +91,7 @@ imap.sasl.plain.password.command = "printenv JM_SECRET_PROTON"
 | `rules` | sender globs → a triage hint |
 | `profile` | path of the owner's notes (default `~/.claude/jadlis/mail/profile.md`) |
 | `mail_wait` | defaults for `mail-wait.sh` when `agent.conf` does not set them |
+| `timezone` | IANA zone for local times in the output (`Europe/Warsaw`) when the machine runs in UTC; a `TZ` in the environment wins |
 
 ## Add an account
 
@@ -101,3 +102,10 @@ Prerequisites: `brew install himalaya jq python@3.13` (jm runs on `/opt/homebrew
 3. `jm preflight --acct <name> --create-folders` — folders listed, the newsletters and notifications folders exist, MOVE and UIDPLUS reported.
 4. `jm window --acct <name> --dry-run` — the first window reads the last 30 days only.
 5. Optional: set `mail_dir` for the local index and run `jm index --acct <name>`.
+
+## Linux (server)
+
+- jm starts Homebrew's `python3.13` on macOS and `python3` from `PATH` elsewhere (3.10+). himalaya: `JM_HIMALAYA`, else the first `himalaya` on `PATH`, else `~/.local/bin/himalaya`.
+- Proton Mail Bridge runs as a `systemd --user` unit; jm starts it with `systemctl --user start proton-bridge.service` when 127.0.0.1:1143 does not answer (`JM_BRIDGE_UNIT` names another unit). Point `imap.tls.cert` at the Bridge's own `cert.pem` (`~/.config/protonmail/bridge-v3/cert.pem` by default).
+- No Apple Mail copy: leave `mail_dir` out; search goes to the server.
+- Set `"timezone"` in `config.json` if the machine clock is UTC.

@@ -1,5 +1,6 @@
-#!/opt/homebrew/bin/python3.13 -I
-"""jm — jadlis-mail: Claude's mail layer over himalaya (IMAP) for the IMAP accounts in config.json
+#!/bin/sh
+"""":; [ -x /opt/homebrew/bin/python3.13 ] && exec /opt/homebrew/bin/python3.13 -I "$0" "$@"; exec /usr/bin/env python3 -I "$0" "$@"  # sh: Homebrew Python on macOS, PATH python3 elsewhere
+jm — jadlis-mail: Claude's mail layer over himalaya (IMAP) for the IMAP accounts in config.json
 (iCloud, Gmail, Proton via Bridge, any IMAP server).
 
 Every write to a mailbox goes through jm, in three steps: find the message by Message-ID, act, check the result
@@ -29,6 +30,7 @@ import email.policy
 import email.utils
 import fcntl
 import fnmatch
+import shutil
 import hashlib
 import html
 import html.parser
@@ -50,7 +52,20 @@ HCONF = HOME / ".config" / "himalaya"
 BASE_TOML = HCONF / "config.toml"          # himalaya's own config; jm loads it together with personal.toml
 PERSONAL_TOML = HCONF / "personal.toml"    # optional further IMAP accounts; may be absent
 SEND_TOML = HCONF / "send.toml"            # SMTP blocks — loaded only by `jm send`
-HIMALAYA = "/opt/homebrew/bin/himalaya"
+MAC_HIMALAYA = "/opt/homebrew/bin/himalaya"
+
+
+def find_himalaya():
+    """JM_HIMALAYA, else Homebrew's on macOS, else the first on PATH, else ~/.local/bin (systemd's PATH is minimal)."""
+    for c in (os.environ.get("JM_HIMALAYA"), MAC_HIMALAYA if sys.platform == "darwin" else None,
+              shutil.which("himalaya"), str(HOME / ".local" / "bin" / "himalaya")):
+        if c and os.access(c, os.X_OK):
+            return c
+    return MAC_HIMALAYA if sys.platform == "darwin" else "himalaya"
+
+
+HIMALAYA = find_himalaya()
+BRIDGE_UNIT = os.environ.get("JM_BRIDGE_UNIT", "proton-bridge.service")   # Linux: systemd --user unit of the Bridge
 BRIDGE = ("127.0.0.1", 1143)
 
 MIN_AGE_MIN = 30              # younger mail is never triaged; it waits in the queue for the next window
@@ -417,6 +432,10 @@ def load_config():
         cfg = json.loads(p.read_text())
     except FileNotFoundError:
         raise JmError(f"no config at {p} — see references/accounts.md")
+    tz = cfg.get("timezone")           # e.g. "Europe/Warsaw" on a server that runs in UTC; TZ in the env wins
+    if tz and not os.environ.get("TZ"):
+        os.environ["TZ"] = tz
+        time.tzset()
     for name, a in cfg.get("accounts", {}).items():
         a["name"] = name
     return cfg
@@ -694,7 +713,11 @@ def bridge_up():
 def ensure_bridge():
     if bridge_up():
         return
-    subprocess.run(["/usr/bin/open", "-a", "Proton Mail Bridge"], env=clean_env(), capture_output=True)
+    if sys.platform == "darwin":
+        subprocess.run(["/usr/bin/open", "-a", "Proton Mail Bridge"], env=clean_env(), capture_output=True)
+    else:
+        subprocess.run(["systemctl", "--user", "start", BRIDGE_UNIT], env=clean_env(), capture_output=True,
+                       stdin=subprocess.DEVNULL, timeout=60)
     for _ in range(45):
         time.sleep(1)
         if bridge_up():
