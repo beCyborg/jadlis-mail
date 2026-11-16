@@ -38,3 +38,23 @@ def test_bridge_started_by_systemd_on_linux(monkeypatch):
     monkeypatch.setattr(jm.subprocess, "run", lambda argv, **kw: calls.append(argv) or subprocess.CompletedProcess(argv, 0))
     jm.ensure_bridge()
     assert calls == [["systemctl", "--user", "start", "proton-bridge.service"]]
+
+
+def test_proton_waits_while_bridge_loads_the_account(monkeypatch):
+    jm = load_jm()
+    calls = []
+
+    class Acc:
+        def __init__(self, h, cfg, name):
+            pass
+
+        def folders(self):
+            calls.append(1)
+            if len(calls) < 3:
+                raise jm.HimalayaError("proton: himalaya imap list: IMAP AUTHENTICATE PLAIN failed: NO no such user")
+
+    monkeypatch.setattr(jm, "Account", Acc)
+    monkeypatch.setattr(jm, "ensure_bridge", lambda: None)
+    monkeypatch.setattr(jm.time, "sleep", lambda s: None)
+    jm.open_account(None, {"accounts": {"proton": {"provider": "proton"}}}, "proton")
+    assert len(calls) == 3

@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+## [0.4.2] — 2026-11-16 — Bridge после перезапуска / Bridge right after a restart
+
+### For agents
+- Fixed: a Proton account retries for up to 30 s while a just-started Bridge answers «NO no such user» (it opens the port before it loads the account). Tests: `test_jadlis_mail_linux.py`.
+
 ## [0.4.1] — 2026-11-16 — Bridge из треда агента / Bridge from an agent shell
 
 ### For agents

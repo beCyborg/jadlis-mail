@@ -729,10 +729,20 @@ def ensure_bridge():
 
 
 def open_account(h, cfg, name):
-    if cfg["accounts"][name].get("provider") == "proton":
+    proton = cfg["accounts"][name].get("provider") == "proton"
+    if proton:
         ensure_bridge()
     a = Account(h, cfg, name)
-    a.folders()
+    # A Bridge that has just (re)started opens its port before it loads the account and answers
+    # «NO no such user» for a few seconds — wait for it instead of failing.
+    for attempt in range(10 if proton else 1):
+        try:
+            a.folders()
+            return a
+        except HimalayaError as e:
+            if not proton or "no such user" not in str(e).lower() or attempt == 9:
+                raise
+            time.sleep(3)
     return a
 
 
