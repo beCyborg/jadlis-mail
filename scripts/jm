@@ -716,7 +716,9 @@ def ensure_bridge():
     if sys.platform == "darwin":
         subprocess.run(["/usr/bin/open", "-a", "Proton Mail Bridge"], env=clean_env(), capture_output=True)
     else:
-        subprocess.run(["systemctl", "--user", "start", BRIDGE_UNIT], env=clean_env(), capture_output=True,
+        env = clean_env()
+        env.setdefault("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}")   # agent shells often lack it
+        subprocess.run(["systemctl", "--user", "start", BRIDGE_UNIT], env=env, capture_output=True,
                        stdin=subprocess.DEVNULL, timeout=60)
     for _ in range(45):
         time.sleep(1)

@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+## [0.4.1] — 2026-11-16 — Bridge из треда агента / Bridge from an agent shell
+
+### For agents
+- Fixed: on Linux `ensure_bridge` sets `XDG_RUNTIME_DIR=/run/user/<uid>` when missing, so `systemctl --user` reaches the user bus from agent shells.
+
 ## [0.4.0] — 2026-11-16 — jm на Linux / jm on Linux
 
 ### Для человека
